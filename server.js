@@ -98,39 +98,16 @@ app.get('/profile/:id', (req, res) => {
 
 app.put('/image', (req, res) => { 
     const {id} = req.body;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            user.entries++
-            return res.json(user.entries);
-        } 
+    db('users').where('id', '=', id)
+    .increment('entries', 1)
+    .returning('entries')
+    .then(entries => {
+        res.json(entries[0]); 
     })
-    if (!found) {
-        res.status(400).json('No such user');
-    }
+    .catch(err => res.status(400).json('unable to get entries'))
 })
 
  
-
-
-
-// // Load hash from your password DB.
-// bcrypt.compare("bacon", hash, function(err, res) {
-//     // res == true
-// });
-// bcrypt.compare("veggies", hash, function(err, res) {
-//     // res = false
-// });
-
-
-        // Load hash from your password DB.
-    // bcrypt.compare("apples", hash, function(err, res) {
-    //     console.log('first guess', res)
-    // });
-    // bcrypt.compare("veggies", hash, function(err, res) {
-    //     console.log('second guess', res)
-    // });
 
 app.listen(3000, () => {
     console.log('listening on port 3000')
